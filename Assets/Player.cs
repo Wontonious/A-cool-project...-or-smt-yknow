@@ -5,12 +5,14 @@ public class Player : MonoBehaviour
     public float moveSpeed = 5f;
     public float rotationSpeed = 1f;
     public Rigidbody2D rb;
+    public CircleCollider2D collider;
 
     private Vector2 moveDirection;
     private Vector2 mousePos;
 
     public Camera cam;
     SwitchPlayer playerSwitcher;
+
 
     void Start()
     {
@@ -59,4 +61,5 @@ public class Player : MonoBehaviour
         float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
         rb.rotation = angle;
     }
+
 }
