@@ -13,27 +13,26 @@ public class Player : MonoBehaviour
     //Jumping
     public float jumpDivide = 1.5f;
     public float jumpForce = 25f;
-    float jumpMultiplier = 10000f;
     public float gravity = -9.81f;
     public bool isGrounded = false;
     private bool occurOnce = false;
-    public bool canJump = true;
 
     //Player health
-    public float playerHealth = 50f;
+    float playerHealth = 50f;
 
     //Misc 
     public Rigidbody2D rb;
     public Animator anim;
-    SwitchPlayer player;
     public SpriteRenderer sprite;
+    GroundCheck grounded;
+    SwitchPlayer player;
 
 
     void Start()
     {
         movingSpeed = moveSpeed;
         player = GetComponent<SwitchPlayer>();
-        //playerIsGrounded = GetComponent<FootOnGround>();
+        grounded = GetComponent<GroundCheck>();
     }
 
     // Update is called once per frame
@@ -47,10 +46,11 @@ public class Player : MonoBehaviour
         {
             rb.AddForce(Vector2.up * gravity * 0.75f * Time.deltaTime);
         }
+        moveDirection.y += gravity * Time.deltaTime;
 
     }
 
-        private void FixedUpdate()
+    private void FixedUpdate()
     {
         if (player.SelectPlayer())
         {
@@ -61,55 +61,41 @@ public class Player : MonoBehaviour
             CounterMoves();
             Move();
         }
-
-        if (!player.SelectPlayer())
-        {
-            rb.velocity = Vector2.zero;
-        }
+        anim.SetFloat("MoveSpeed", Mathf.Abs(moveDirection.x));
     }
 
     void ProcessInputs()
     {
         moveDirection.x = Input.GetAxisRaw("Horizontal") * moveSpeed;
-        anim.SetFloat("MoveSpeed", Mathf.Abs(Input.GetAxisRaw("Horizontal")));
 
-        if (Input.GetButtonDown("Jump") && isGrounded && canJump)
+        if (Input.GetButtonDown("Jump") && (isGrounded || grounded.Grounded()))
         {
             rb.velocity = new Vector2(rb.velocity.x, 0f);
-            rb.AddForce(Vector2.up.normalized * jumpForce * jumpMultiplier * Time.deltaTime);
-            moveSpeed /= 4f;
-            canJump = false;
-        }
 
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        }
 
         if (Input.GetKey(KeyCode.A))
         {
-            rb.AddForce(moveDirection * moveSpeed * Time.deltaTime);
             sprite.flipX = true;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            rb.AddForce(moveDirection * moveSpeed * Time.deltaTime);
             sprite.flipX = false;
         }
 
         if (isGrounded)
         {
+            moveDirection.y = -2f;
             moveSpeed = movingSpeed;
             occurOnce = true;
-            canJump = true;
         }
 
         if (!isGrounded && occurOnce)
         {
+            rb.AddForce(Vector2.down * gravity * Time.deltaTime);
             occurOnce = false;
-            canJump = false;
             moveSpeed = moveSpeed / jumpDivide;
-        }
-
-        if(Input.GetAxisRaw("Horizontal") == 0 && (rb.velocity.x > 0.1f || rb.velocity.x <0.1f))
-        {
-            rb.AddForce(Vector2.right * -rb.velocity.normalized);
         }
     }
 
@@ -128,21 +114,22 @@ public class Player : MonoBehaviour
 
     void Move()
     {
-        //rb.AddForce(moveDirection + counterMove);
+        rb.AddForce(moveDirection * moveSpeed + counterMove);
     }
-    
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.layer == 8)
-        {
-            isGrounded = true;
-        }
-    }
+
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.layer == 8)
         {
             isGrounded = false;
+        }
+    }
+    
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if(collision.gameObject.layer == 8)
+        {
+            isGrounded = true;
         }
     }
 
