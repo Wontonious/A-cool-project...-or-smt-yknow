@@ -6,7 +6,7 @@ public class SwitchPlayer : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown("space"))
+        if (Input.GetMouseButtonDown(1))
         {
             PlayerSelector();
         }
