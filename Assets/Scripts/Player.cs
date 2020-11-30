@@ -54,6 +54,8 @@ public class Player : MonoBehaviour
     {
         if (player.SelectPlayer())
         {
+            anim.SetFloat("MoveSpeed", Mathf.Abs(moveDirection.x));
+
             if (rb.velocity.magnitude > maxSpeed)
             {
                 rb.velocity = rb.velocity.normalized * maxSpeed;
@@ -61,7 +63,13 @@ public class Player : MonoBehaviour
             CounterMoves();
             Move();
         }
-        anim.SetFloat("MoveSpeed", Mathf.Abs(moveDirection.x));
+        if (!player.SelectPlayer())
+        {
+            anim.SetFloat("MoveSpeed", 0f);
+            Vector2 movement = Vector2.zero;
+            movement.y = rb.velocity.y;
+            rb.velocity = movement;
+        }
     }
 
     void ProcessInputs()
