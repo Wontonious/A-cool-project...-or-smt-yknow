@@ -27,7 +27,6 @@ public class Player : MonoBehaviour
     GroundCheck grounded;
     SwitchPlayer player;
 
-
     void Start()
     {
         movingSpeed = moveSpeed;
