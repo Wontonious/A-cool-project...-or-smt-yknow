@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
     public float jumpForce = 25f;
     public float gravity = -9.81f;
     private bool occurOnce = false;
+    public bool isGrounded = false;
 
     //Player health
     float playerHealth = 50f;
@@ -79,7 +80,7 @@ public class Player : MonoBehaviour
 
     void Jump()
     {
-        if (Input.GetButtonDown("Jump") && grounded.Grounded())
+        if (Input.GetButtonDown("Jump") && (grounded.Grounded() || isGrounded))
         {
             rb.velocity = new Vector2(rb.velocity.x, 0f);
 
@@ -99,14 +100,14 @@ public class Player : MonoBehaviour
             sprite.flipX = false;
         }
 
-        if (grounded.Grounded())
+        if (grounded.Grounded() || isGrounded)
         {
             moveDirection.y = -2f;
             moveSpeed = movingSpeed;
             occurOnce = true;
         }
 
-        if (!grounded.Grounded() && occurOnce)
+        if ((!grounded.Grounded() || !isGrounded) && occurOnce)
         {
             rb.AddForce(Vector2.down * gravity * Time.deltaTime);
             occurOnce = false;
@@ -133,7 +134,7 @@ public class Player : MonoBehaviour
     }
 
     /*
-    private void OnCollisionExit2D(Collision2D collision)
+     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.layer == 8)
         {
@@ -149,7 +150,6 @@ public class Player : MonoBehaviour
         }
     }
     */
-
 
     void TakeDamage(float damage)
     {
