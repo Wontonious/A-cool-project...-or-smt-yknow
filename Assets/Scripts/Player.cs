@@ -14,7 +14,6 @@ public class Player : MonoBehaviour
     public float jumpDivide = 1.5f;
     public float jumpForce = 25f;
     public float gravity = -9.81f;
-    public bool isGrounded = false;
     private bool occurOnce = false;
 
     //Player health
@@ -39,8 +38,9 @@ public class Player : MonoBehaviour
     {
         if (player.SelectPlayer())
         {
-            ProcessInputs();
+            Jump();
         }
+
         if (rb.velocity.y > 0)
         {
             rb.AddForce(Vector2.up * gravity * 0.75f * Time.deltaTime);
@@ -51,6 +51,12 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (player.SelectPlayer())
+        {
+            ProcessInputs();
+        }
+
+
         if (player.SelectPlayer())
         {
             anim.SetFloat("MoveSpeed", Mathf.Abs(moveDirection.x));
@@ -71,16 +77,18 @@ public class Player : MonoBehaviour
         }
     }
 
-    void ProcessInputs()
+    void Jump()
     {
-        moveDirection.x = Input.GetAxisRaw("Horizontal") * moveSpeed;
-
-        if (Input.GetButtonDown("Jump") && (isGrounded || grounded.Grounded()))
+        if (Input.GetButtonDown("Jump") && grounded.Grounded())
         {
             rb.velocity = new Vector2(rb.velocity.x, 0f);
 
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
+    }
+    void ProcessInputs()
+    {
+        moveDirection.x = Input.GetAxisRaw("Horizontal") * moveSpeed;
 
         if (Input.GetKey(KeyCode.A))
         {
@@ -91,14 +99,14 @@ public class Player : MonoBehaviour
             sprite.flipX = false;
         }
 
-        if (isGrounded)
+        if (grounded.Grounded())
         {
             moveDirection.y = -2f;
             moveSpeed = movingSpeed;
             occurOnce = true;
         }
 
-        if (!isGrounded && occurOnce)
+        if (!grounded.Grounded() && occurOnce)
         {
             rb.AddForce(Vector2.down * gravity * Time.deltaTime);
             occurOnce = false;
@@ -124,6 +132,7 @@ public class Player : MonoBehaviour
         rb.AddForce(moveDirection * moveSpeed + counterMove);
     }
 
+    /*
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.layer == 8)
@@ -139,6 +148,7 @@ public class Player : MonoBehaviour
             isGrounded = true;
         }
     }
+    */
 
 
     void TakeDamage(float damage)
