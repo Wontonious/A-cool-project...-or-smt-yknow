@@ -40,14 +40,14 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: PlayerBG
+  - name: Background
     uniqueID: 2601881147
     locked: 0
   - name: Player
-    uniqueID: 1003748417
-    locked: 0
-  - name: PlayerFG
     uniqueID: 1067088387
+    locked: 0
+  - name: Foreground
+    uniqueID: 3222912703
     locked: 0
   - name: Default
     uniqueID: 0
